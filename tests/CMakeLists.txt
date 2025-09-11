@@ -1,0 +1,3 @@
+add_subdirectory(Primitive)
+add_subdirectory(GoogleTests)
+add_subdirectory(StaticAnalysis)
