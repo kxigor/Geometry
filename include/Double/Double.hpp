@@ -5,7 +5,7 @@
 #include <limits>
 
 template <std::floating_point DoubleType,
-          DoubleType eps = std::numeric_limits<DoubleType>::epsilon()>
+          DoubleType Eps = std::numeric_limits<DoubleType>::epsilon()>
 struct Double {
   using DoubleT = DoubleType;
 
@@ -14,6 +14,8 @@ struct Double {
   constexpr Double(const Double& /*unused*/) = default;
 
   constexpr Double(Double&& /*unused*/) = default;
+
+  constexpr ~Double() = default;
 
   constexpr Double(const DoubleT& number) : number_(number) {}  // NOLINT
 
@@ -75,7 +77,7 @@ struct Double {
   [[nodiscard]] friend constexpr bool operator==(const Double& lhs,
                                                  const Double& rhs) noexcept {
     using std::abs;
-    return abs(lhs.number_ - rhs.number_) <= eps;
+    return abs(lhs.number_ - rhs.number_) <= Eps;
   }
 
   [[nodiscard]] friend constexpr auto operator<=>(const Double& lhs,
@@ -111,9 +113,9 @@ struct Double {
   DoubleT number_;
 };
 
-template <typename DoubleType, DoubleType eps>
-struct std::hash<Double<DoubleType, eps>> {
-  constexpr size_t operator()(const Double<DoubleType, eps>& dbl) const {
+template <typename DoubleType, DoubleType Eps>
+struct std::hash<Double<DoubleType, Eps>> {
+  constexpr size_t operator()(const Double<DoubleType, Eps>& dbl) const {
     return std::hash<DoubleType>{}(dbl);
   }
 };
@@ -121,11 +123,10 @@ struct std::hash<Double<DoubleType, eps>> {
 namespace std {
 
 // NOLINTBEGIN
-
-template <std::floating_point DoubleType, DoubleType eps>
-class numeric_limits<Double<DoubleType, eps>> {
+template <std::floating_point DoubleType, DoubleType Eps>
+class numeric_limits<Double<DoubleType, Eps>> {
  public:
-  using D = Double<DoubleType, eps>;
+  using D = Double<DoubleType, Eps>;
   using Base = numeric_limits<DoubleType>;
 
   static constexpr bool is_specialized = true;
@@ -156,7 +157,7 @@ class numeric_limits<Double<DoubleType, eps>> {
   static constexpr D min() noexcept { return Base::min(); }
   static constexpr D max() noexcept { return Base::max(); }
   static constexpr D lowest() noexcept { return Base::lowest(); }
-  static constexpr D epsilon() noexcept { return eps; }
+  static constexpr D epsilon() noexcept { return Eps; }
   static constexpr D round_error() noexcept { return Base::round_error(); }
   static constexpr D infinity() noexcept { return Base::infinity(); }
   static constexpr D quiet_NaN() noexcept { return Base::quiet_NaN(); }

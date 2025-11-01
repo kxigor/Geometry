@@ -1,7 +1,7 @@
 #!/bin/bash
 source ./tests/Helpers/test_utils.sh
 
-FILENAME=D.out
+FILENAME=build/bin/D
 INPUT=$'4 4
 400 400
 600 400

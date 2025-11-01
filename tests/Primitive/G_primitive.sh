@@ -1,7 +1,7 @@
 #!/bin/bash
 source ./tests/Helpers/test_utils.sh
 
-FILENAME=G.out
+FILENAME=build/bin/G
 INPUT=$'4 4 4
 1 1
 1 3

@@ -7,8 +7,15 @@
 #include <utility>
 
 #include "Geometry/Geometry.hpp"
-
-static geometry::ConvexHull GetConvexHull(std::size_t number_of_points);
+namespace {
+geometry::ConvexHull GetConvexHull(std::size_t number_of_points) {
+  geometry::PointsT convex_hull(number_of_points);
+  std::copy_n(std::istream_iterator<geometry::Point>{std::cin},
+              number_of_points, convex_hull.begin());
+  return geometry::ConvexHull::InitViaUnorderedConvexHull(
+      std::move(convex_hull));
+}
+}  // namespace
 
 int main() {
   std::size_t number_of_airoport_points{};
@@ -21,21 +28,13 @@ int main() {
   auto difference =
       CalcMinkowskiDifference(airoport_convex_hull, cloud_convex_hull);
 
-  std::cout << std::fixed << std::setprecision(20);
+  std::cout << std::fixed << std::setprecision(20);  // NOLINT
   if (const geometry::Point kNullPoint{0, 0};
       geometry::IsIntersect(difference, kNullPoint)) {
     std::cout << std::max(geometry::CalcDistance(difference, kNullPoint) -
-                              geometry::ScalarT(60.0),
+                              geometry::ScalarT(60.0),  // NOLINT
                           geometry::ScalarT(0));
   } else {
     std::cout << 0;
   }
-}
-
-geometry::ConvexHull GetConvexHull(std::size_t number_of_points) {
-  geometry::PointsT convex_hull(number_of_points);
-  std::copy_n(std::istream_iterator<geometry::Point>{std::cin},
-              number_of_points, convex_hull.begin());
-  return geometry::ConvexHull::InitViaUnorderedConvexHull(
-      std::move(convex_hull));
 }

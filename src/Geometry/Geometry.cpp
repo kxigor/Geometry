@@ -18,8 +18,8 @@ namespace geometry {
 
 [[nodiscard]] Ray RotateRayRadian(const Ray& ray, ScalarT angle_radians,
                                   bool clockwise) noexcept {
-  Point origin = ray.GetOrigin();
-  Point dir = ray.GetDirection();
+  const Point origin = ray.GetOrigin();
+  const Point dir = ray.GetDirection();
 
   if (!clockwise) {
     angle_radians = -angle_radians;
@@ -28,20 +28,21 @@ namespace geometry {
   // [ cosθ  sinθ ]
   // [-sinθ  cosθ ]
   using std::cos, std::sin;
-  auto cos_theta = ScalarT(cos(angle_radians));
-  auto sin_theta = ScalarT(sin(angle_radians));
+  const auto cos_theta = ScalarT(cos(angle_radians));
+  const auto sin_theta = ScalarT(sin(angle_radians));
 
-  auto new_dir_x = dir.GetX() * cos_theta + dir.GetY() * sin_theta;
-  auto new_dir_y = -dir.GetX() * sin_theta + dir.GetY() * cos_theta;
+  const auto new_dir_x = dir.GetX() * cos_theta + dir.GetY() * sin_theta;
+  const auto new_dir_y = -dir.GetX() * sin_theta + dir.GetY() * cos_theta;
 
-  Point new_direction(new_dir_x, new_dir_y);
+  const Point new_direction(new_dir_x, new_dir_y);
   return Ray{origin, new_direction};
 }
 
 [[nodiscard]] Ray RotateRayDegree(const Ray& ray, ScalarT angle_degrees,
                                   bool clockwise) noexcept {
-  return RotateRayRadian(ray, angle_degrees * ScalarT(M_PI) / ScalarT(180.0),
-                         clockwise);
+  return RotateRayRadian(
+      ray, angle_degrees * ScalarT(M_PI) / ScalarT(180.0),  // NOLINT
+      clockwise);
 }
 
 [[nodiscard]] Orientation CalcOrientation(const Point& a, const Point& b,
@@ -66,9 +67,9 @@ namespace geometry {
     return false;
   }
 
-  auto [x, y] = p.GetAsTuple();
-  auto [x1, y1] = seg.GetPointA().GetAsTuple();
-  auto [x2, y2] = seg.GetPointB().GetAsTuple();
+  const auto [x, y] = p.GetAsTuple();
+  const auto [x1, y1] = seg.GetPointA().GetAsTuple();
+  const auto [x2, y2] = seg.GetPointB().GetAsTuple();
 
   using std::max;
   using std::min;
@@ -87,12 +88,12 @@ namespace geometry {
 
 [[nodiscard]] bool IsIntersect(const Segment& seg_a,
                                const Segment& seg_b) noexcept {
-  auto [A, B] = seg_a.GetAsTuple();
-  auto [C, D] = seg_b.GetAsTuple();
-  auto o1 = CalcOrientation(A, B, C);
-  auto o2 = CalcOrientation(A, B, D);
-  auto o3 = CalcOrientation(C, D, A);
-  auto o4 = CalcOrientation(C, D, B);
+  const auto [A, B] = seg_a.GetAsTuple();
+  const auto [C, D] = seg_b.GetAsTuple();
+  const auto o1 = CalcOrientation(A, B, C);
+  const auto o2 = CalcOrientation(A, B, D);
+  const auto o3 = CalcOrientation(C, D, A);
+  const auto o4 = CalcOrientation(C, D, B);
   return (o1 != o2 && o3 != o4) ||
          (o1 == Orientation::Collinear && IsIntersect(A, C, B)) ||
          (o2 == Orientation::Collinear && IsIntersect(A, D, B)) ||
@@ -102,9 +103,9 @@ namespace geometry {
 
 [[nodiscard]] bool IsIntersect(const Line& line_a,
                                const Line& line_b) noexcept {
-  auto [a1, b1, c1] = line_a.GetAsTuple();
-  auto [a2, b2, c2] = line_b.GetAsTuple();
-  ScalarT det = a1 * b2 - a2 * b1;
+  const auto [a1, b1, c1] = line_a.GetAsTuple();
+  const auto [a2, b2, c2] = line_b.GetAsTuple();
+  const ScalarT det = a1 * b2 - a2 * b1;
   if (det == ScalarT(0)) {
     if (b1 != ScalarT(0)) {
       return c2 * b1 == c1 * b2;
@@ -115,17 +116,17 @@ namespace geometry {
 }
 
 [[nodiscard]] bool IsIntersect(const Ray& ray, const Line& line) noexcept {
-  auto [a, b, c] = line.GetAsTuple();
-  Point line_normal(a, b);
+  const auto [a, b, c] = line.GetAsTuple();
+  const Point line_normal(a, b);
 
-  ScalarT denom = ray.GetDirection().ScalarProduct(line_normal);
+  const ScalarT denom = ray.GetDirection().ScalarProduct(line_normal);
 
   if (denom == ScalarT(0)) {
     return (a * ray.GetOrigin().GetX() + b * ray.GetOrigin().GetY() + c) ==
            ScalarT(0);
   }
 
-  ScalarT t = -(line_normal.ScalarProduct(ray.GetOrigin()) + c) / denom;
+  const ScalarT t = -(line_normal.ScalarProduct(ray.GetOrigin()) + c) / denom;
   return t >= ScalarT(0);
 }
 
@@ -134,22 +135,22 @@ namespace geometry {
 }
 
 [[nodiscard]] bool IsIntersect(const Ray& ray_a, const Ray& ray_b) noexcept {
-  Point dir1 = ray_a.GetDirection();
-  Point dir2 = ray_b.GetDirection();
+  const Point dir1 = ray_a.GetDirection();
+  const Point dir2 = ray_b.GetDirection();
 
-  ScalarT det = dir2.VectorProduct(dir1);
+  const ScalarT det = dir2.VectorProduct(dir1);
 
   if (det == ScalarT(0)) {
-    Point diff = ray_b.GetOrigin() - ray_a.GetOrigin();
+    const Point diff = ray_b.GetOrigin() - ray_a.GetOrigin();
     if (diff.VectorProduct(dir1) != ScalarT(0)) {
       return false;
     }
     return dir1.ScalarProduct(dir2) > ScalarT(0);
   }
 
-  Point diff = ray_b.GetOrigin() - ray_a.GetOrigin();
-  ScalarT t1 = diff.VectorProduct(dir2) / det;
-  ScalarT t2 = diff.VectorProduct(dir1) / det;
+  const Point diff = ray_b.GetOrigin() - ray_a.GetOrigin();
+  const ScalarT t1 = diff.VectorProduct(dir2) / det;
+  const ScalarT t2 = diff.VectorProduct(dir1) / det;
 
   return t1 >= ScalarT(0) && t2 >= ScalarT(0);
 }
@@ -193,7 +194,7 @@ namespace geometry {
 }
 
 [[nodiscard]] bool IsIntersect(const HalfPlane& hp, const Point& p) noexcept {
-  ScalarT value = hp.GetA() * p.GetX() + hp.GetB() * p.GetY() + hp.GetC();
+  const ScalarT value = hp.GetA() * p.GetX() + hp.GetB() * p.GetY() + hp.GetC();
   return value >= ScalarT(0);
 }
 
@@ -202,16 +203,16 @@ namespace geometry {
 }
 
 std::optional<Point> Intersect(const Ray& ray, const Line& line) noexcept {
-  auto [a, b, c] = line.GetAsTuple();
-  Vector line_normal(a, b);
+  const auto [a, b, c] = line.GetAsTuple();
+  const Vector line_normal(a, b);
 
-  ScalarT denom = ray.GetDirection().ScalarProduct(line_normal);
+  const ScalarT denom = ray.GetDirection().ScalarProduct(line_normal);
 
   if (denom == ScalarT(0)) {
     return std::nullopt;
   }
 
-  ScalarT t = -(line_normal.ScalarProduct(ray.GetOrigin()) + c) / denom;
+  const ScalarT t = -(line_normal.ScalarProduct(ray.GetOrigin()) + c) / denom;
   if (t < ScalarT(0)) {
     return std::nullopt;
   }
@@ -226,20 +227,22 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
 [[nodiscard]] std::optional<Point> Intersect(const HalfPlane& hp,
                                              const Point& curr,
                                              const Point& next) noexcept {
-  ScalarT a = hp.GetA(), b = hp.GetB(), c = hp.GetC();
-  ScalarT denom = Point(a, b).ScalarProduct(next - curr);
+  const ScalarT a = hp.GetA();
+  const ScalarT b = hp.GetB();
+  const ScalarT c = hp.GetC();
+  const ScalarT denom = Point(a, b).ScalarProduct(next - curr);
   if (denom == ScalarT(0)) {
     return std::nullopt;
   }
-  ScalarT t = -(a * curr.GetX() + b * curr.GetY() + c) / denom;
+  const ScalarT t = -(a * curr.GetX() + b * curr.GetY() + c) / denom;
   if (t < ScalarT(0) || t > ScalarT(1)) {
     return std::nullopt;
   }
   return curr + (next - curr) * t;
 }
 
-[[nodiscard]] static PointsT IntersectImpl(const PointsT& ch,
-                                           const HalfPlane& hp) {
+namespace {
+[[nodiscard]] PointsT IntersectImpl(const PointsT& ch, const HalfPlane& hp) {
   if (ch.empty()) {
     return {};
   }
@@ -249,9 +252,9 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
   bool prev_inside = IsIntersect(hp, prev);
 
   for (const Point& curr : ch) {
-    bool curr_inside = IsIntersect(hp, curr);
+    const bool curr_inside = IsIntersect(hp, curr);
     if (curr_inside != prev_inside) {
-      auto intersect = Intersect(hp, prev, curr);
+      auto intersect = Intersect(hp, prev, curr);  // NOLINT
       if (intersect) {
         new_convex_hull.push_back(*intersect);
       }
@@ -265,6 +268,7 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
 
   return new_convex_hull;
 }
+}  // namespace
 
 [[nodiscard]] ConvexHull Intersect(const ConvexHull& ch, const HalfPlane& hp) {
   return ConvexHull::InitViaUnorderedConvexHullWithDuplicates(
@@ -295,28 +299,29 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
 }
 
 [[nodiscard]] ScalarT CalcDistance(const Point& a, const Point& b) noexcept {
-  auto dx = a.GetX() - b.GetX();
-  auto dy = a.GetY() - b.GetY();
+  const auto dx = a.GetX() - b.GetX();
+  const auto dy = a.GetY() - b.GetY();
   using std::sqrt;
   return sqrt((dx * dx) + (dy * dy));
 }
 
 [[nodiscard]] ScalarT CalcDistance(const Point& p,
                                    const Segment& seg) noexcept {
+  using std::clamp;
+
   if (seg.IsDegenerate()) {
     return CalcDistance(p, seg.GetPointA());
     return CalcDistance(p, seg.GetPointA());
   }
 
-  auto [A, B] = seg.GetAsTuple();
+  const auto [A, B] = seg.GetAsTuple();
 
-  Point AB = B - A;
-  Point AP = p - A;
+  const Point AB = B - A;
+  const Point AP = p - A;
 
   ScalarT t = AP.ScalarProduct(AB) / AB.SquaredLength();
-  using std::clamp;
   t = clamp(t, ScalarT(0), ScalarT(1));
-  Point Q = A + AB * t;
+  const Point Q = A + AB * t;
   return CalcDistance(p, Q);
 }
 
@@ -331,10 +336,10 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
     return ScalarT(0);
   }
 
-  ScalarT d1 = CalcDistance(seg_a.GetPointA(), seg_b);
-  ScalarT d2 = CalcDistance(seg_a.GetPointB(), seg_b);
-  ScalarT d3 = CalcDistance(seg_b.GetPointA(), seg_a);
-  ScalarT d4 = CalcDistance(seg_b.GetPointB(), seg_a);
+  const ScalarT d1 = CalcDistance(seg_a.GetPointA(), seg_b);
+  const ScalarT d2 = CalcDistance(seg_a.GetPointB(), seg_b);
+  const ScalarT d3 = CalcDistance(seg_b.GetPointA(), seg_a);
+  const ScalarT d4 = CalcDistance(seg_b.GetPointB(), seg_a);
 
   using std::min;
   return min({d1, d2, d3, d4});
@@ -342,7 +347,9 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
 
 [[nodiscard]] ScalarT CalcDistance(const ConvexHull& ch,
                                    const Point& p) noexcept {
-  if (ch.GetSize() == 1) return CalcDistance(ch[0], p);
+  if (ch.GetSize() == 1) {
+    return CalcDistance(ch[0], p);
+  }
   ScalarT distance = std::numeric_limits<ScalarT>::max();
   for (auto edgeIt = ch.EdgeBegin(); edgeIt != ch.EdgeEnd(); ++edgeIt) {
     distance = std::min(distance, CalcDistance(*edgeIt, p));
@@ -363,7 +370,9 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
       ConvexHull::kConvexHullOrientation == Orientation::Clockwise;
   constexpr ScalarT kSign = kOrient ? 1 : -1;
 
-  if (pol_a.IsEmpty() || pol_b.IsEmpty()) return {};
+  if (pol_a.IsEmpty() || pol_b.IsEmpty()) {
+    return {};
+  }
 
   std::unordered_set<Point, Point::Hash> points;
   auto i = static_cast<std::size_t>(distance(
@@ -373,16 +382,24 @@ std::optional<Point> Intersect(const Line& line, const Ray& ray) noexcept {
   auto itA = ConvexHull::EdgeIterator(pol_a, i);
   auto itB = ConvexHull::EdgeIterator(pol_b, j);
   do {
-    if (itA == pol_a.EdgeEnd()) itA = pol_a.EdgeBegin();
-    if (itB == pol_b.EdgeEnd()) itB = pol_b.EdgeBegin();
+    if (itA == pol_a.EdgeEnd()) {
+      itA = pol_a.EdgeBegin();
+    }
+    if (itB == pol_b.EdgeEnd()) {
+      itB = pol_b.EdgeBegin();
+    }
     auto new_point = itA->GetPointA() - itB->GetPointA();
     if (points.contains(new_point)) {
       break;
     }
     points.emplace(new_point);
     const ScalarT cross = itA->GetVector().VectorProduct(itB->GetVector());
-    if (cross * kSign >= ScalarT(0)) ++itA;
-    if (cross * kSign <= ScalarT(0)) ++itB;
+    if (cross * kSign >= ScalarT(0)) {
+      ++itA;
+    }
+    if (cross * kSign <= ScalarT(0)) {
+      ++itB;
+    }
   } while (itA != pol_a.EdgeEnd() || itB != pol_b.EdgeEnd());
 
   return ConvexHull::InitViaUnorderedConvexHull({points.begin(), points.end()});

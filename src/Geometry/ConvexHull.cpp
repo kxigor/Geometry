@@ -90,7 +90,7 @@ ScalarT ConvexHull::GetArea() const noexcept {
   ScalarT area{};
   const std::size_t n = points_.size();
   for (std::size_t i = 0; i < n; ++i) {
-    std::size_t j = (i + 1) % n;
+    const std::size_t j = (i + 1) % n;
     area += points_[i].VectorProduct(points_[j]);
   }
   using std::abs;
@@ -103,7 +103,9 @@ const Point& ConvexHull::operator[](SizeT pos) const noexcept {
   return points_[pos];
 }
 
-bool ConvexHull::IsDegenerate() const noexcept { return points_.size() < 3; }
+bool ConvexHull::IsDegenerate() const noexcept {
+  return points_.size() < 3;  // NOLINT
+}
 
 ConvexHull ConvexHull::ConvexHull::InitViaArbitraryPoints(PointsT points) {
   if (points.empty()) {

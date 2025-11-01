@@ -18,7 +18,9 @@
 
 namespace geometry {
 
-using ScalarT = Double<long double, 1e-10L>;
+using BaseDoubleT = long double;
+static constexpr BaseDoubleT kBasicAccuracy = 1e-10L;
+using ScalarT = Double<BaseDoubleT, kBasicAccuracy>;
 
 class Vector {
  public:
@@ -35,10 +37,13 @@ class Vector {
   Vector(Vector&& /*unused*/) noexcept = default;
 
   Vector(const ScalarT& x, const ScalarT& y) noexcept : x_(x), y_(y) {}
-  Vector(const CoordPairT& coord) noexcept
+
+  explicit Vector(const CoordPairT& coord) noexcept
       : x_(coord.first), y_(coord.second) {}
-  Vector(const ScalarTupleT& coord) noexcept
+
+  explicit Vector(const ScalarTupleT& coord) noexcept
       : x_(std::get<0>(coord)), y_(std::get<1>(coord)) {}
+
   Vector(std::initializer_list<ScalarT> init) {
     if (init.size() != 2) {
       throw std::invalid_argument(
@@ -68,7 +73,7 @@ class Vector {
     return (*this <=> other) == std::strong_ordering::equal;
   }
 
-  [[nodiscard]] Vector operator-() const noexcept { return {-x_, -y_}; }
+  [[nodiscard]] Vector operator-() const noexcept { return Vector(-x_, -y_); }
 
   Vector& operator+=(const Vector& other) noexcept {
     x_ += other.x_;
@@ -155,6 +160,7 @@ class Vector {
 
   /*============================== Hash ===============================*/
   struct Hash {
+    // NOLINTBEGIN
     std::size_t operator()(const Vector& vector) const {
       HashT seed = 0;
       seed ^= std::hash<ScalarT>{}(vector.x_) + 0x9e3779b9 + (seed << 6) +
@@ -163,6 +169,7 @@ class Vector {
               (seed >> 2);
       return seed;
     }
+    // NOLINTEND
   };
 
  private:
@@ -190,8 +197,10 @@ class Segment {
   Segment(Segment&& /*unused*/) noexcept = default;
 
   Segment(const Point& a, const Point& b) noexcept : a_(a), b_(b) {}
+
   explicit Segment(const PointPairT& points) noexcept
       : a_(points.first), b_(points.second) {}
+
   explicit Segment(const PointTupleT& points) noexcept
       : a_(std::get<0>(points)), b_(std::get<1>(points)) {}
 
@@ -242,6 +251,8 @@ class Line {
   Line(const Line& /*unused*/) noexcept = default;
 
   Line(Line&& /*unused*/) noexcept = default;
+
+  ~Line() = default;
 
   Line(ScalarT a, ScalarT b, ScalarT c) : a_(a), b_(b), c_(c) {
     if (a_ == ScalarT(0) && b_ == ScalarT(0)) {
@@ -413,12 +424,14 @@ class ConvexHull {
 
   class EdgeIterator {
    public:
-    EdgeIterator(const ConvexHull& convex_hull, SizeT pos = 0) noexcept
+    explicit EdgeIterator(const ConvexHull& convex_hull, SizeT pos = 0) noexcept
         : convex_hull_(&convex_hull), pos_(pos) {}
 
     EdgeIterator(const EdgeIterator& /*unused*/) noexcept = default;
 
     EdgeIterator(EdgeIterator&& /*unused*/) noexcept = default;
+
+    ~EdgeIterator() = default;
 
     EdgeIterator& operator=(const EdgeIterator& /*unused*/) noexcept = default;
 
@@ -466,8 +479,8 @@ class ConvexHull {
 
    private:
     void UpdateCurrentEdge() noexcept {
-      SizeT i = pos_;
-      SizeT j = (pos_ + 1) % convex_hull_->GetSize();
+      const SizeT i = pos_;
+      const SizeT j = (pos_ + 1) % convex_hull_->GetSize();
       current_edge_ = {convex_hull_->points_[i], convex_hull_->points_[j]};
     }
 
@@ -478,12 +491,13 @@ class ConvexHull {
 
   /*==================== Constructors/Destructors =====================*/
   ConvexHull() = default;
-  ~ConvexHull() = default;
 
   ConvexHull(const ConvexHull& /*unused*/) = default;
   ConvexHull(ConvexHull&& /*unused*/) = default;
 
-  ConvexHull(PointsT points);
+  ~ConvexHull() = default;
+
+  explicit ConvexHull(PointsT points);
 
   /*=========================== Assignments ===========================*/
   ConvexHull& operator=(const ConvexHull& /*unused*/) = default;

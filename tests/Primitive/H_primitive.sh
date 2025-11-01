@@ -1,7 +1,7 @@
 #!/bin/bash
 source ./tests/Helpers/test_utils.sh
 
-FILENAME=H.out
+FILENAME=build/bin/H
 INPUT=$'11
 0 0
 6 0

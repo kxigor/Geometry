@@ -12,13 +12,13 @@ int main() {
   for (auto& point : points) {
     std::cin >> point;
   }
-  geometry3d::ConvexHull convex_hull(std::move(points));
+  const geometry3d::ConvexHull kConvexHull(std::move(points));
   std::size_t number_or_requests{};
   std::cin >> number_or_requests;
-  std::cout << std::fixed << std::setprecision(10);
+  std::cout << std::fixed << std::setprecision(10);  // NOLINT
   for (std::size_t i = 0; i < number_or_requests; ++i) {
     geometry3d::Point p;
     std::cin >> p;
-    std::cout << convex_hull.CalcDistance(p) << '\n';
+    std::cout << kConvexHull.CalcDistance(p) << '\n';
   }
 }

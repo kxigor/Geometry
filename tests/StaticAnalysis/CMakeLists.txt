@@ -1,8 +1,8 @@
 # ================================ FORMAT ================================
 file(GLOB_RECURSE ALL_SOURCES
-  "${CMAKE_SOURCE_DIR}/apps/*.cpp"
-  "${CMAKE_SOURCE_DIR}/src/*.cpp"
-  "${CMAKE_SOURCE_DIR}/include/*.hpp"
+  "${CMAKE_SOURCE_DIR}/apps/**/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/**/*.cpp"
+  "${CMAKE_SOURCE_DIR}/include/**/*.hpp"
 )
 set(CLANG_FORMAT_SCRIPT ${CMAKE_SOURCE_DIR}/tests/StaticAnalysis/clang_format_tests.sh)
 find_program(CLANG_FORMAT "clang-format-19")
@@ -19,8 +19,9 @@ endif()
 
 # ================================= TIDY =================================
 file(GLOB_RECURSE CPP_SOURCES
-  "${CMAKE_SOURCE_DIR}/apps/*.cpp"
-  "${CMAKE_SOURCE_DIR}/src/*.cpp"
+  "${CMAKE_SOURCE_DIR}/apps/**/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/**/*.cpp"
+  "${CMAKE_SOURCE_DIR}/include/**/*.hpp"
 )
 set(CLANG_TIDY_SCRIPT ${CMAKE_SOURCE_DIR}/tests/StaticAnalysis/clang_tidy_tests.sh)
 find_program(CLANG_TIDY "clang-tidy-19")

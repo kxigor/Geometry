@@ -1,7 +1,7 @@
 #!/bin/bash
 source ./tests/Helpers/test_utils.sh
 
-FILENAME=F.out
+FILENAME=build/bin/F
 INPUT=$'6
 0 0 0
 100 0 0

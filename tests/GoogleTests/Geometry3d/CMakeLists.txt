@@ -1,0 +1,4 @@
+add_google_test(GeometryBasic3dTests basic.cpp)
+
+target_link_libraries(GeometryBasic3dTests PRIVATE Geometry3d)
+target_include_directories(GeometryBasic3dTests PRIVATE ${CMAKE_SOURCE_DIR}/include)

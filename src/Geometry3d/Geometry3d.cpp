@@ -11,24 +11,24 @@ namespace geometry3d {
   const auto& R = face.GetR();
   const auto& normal = face.GetNormal();
 
-  Vector v0 = R - P;
-  Vector v1 = Q - P;
-  Vector v2 = p - P;
+  const Vector v0 = R - P;
+  const Vector v1 = Q - P;
+  const Vector v2 = p - P;
 
-  ScalarT dot = normal.ScalarProduct(v2);
+  const ScalarT dot = normal.ScalarProduct(v2);
   if (dot > ScalarT(0)) {
     return false;
   }
 
-  ScalarT d00 = v0.ScalarProduct(v0);
-  ScalarT d01 = v0.ScalarProduct(v1);
-  ScalarT d11 = v1.ScalarProduct(v1);
-  ScalarT d20 = v2.ScalarProduct(v0);
-  ScalarT d21 = v2.ScalarProduct(v1);
-  ScalarT denom = d00 * d11 - d01 * d01;
-  ScalarT v = (d11 * d20 - d01 * d21) / denom;
-  ScalarT w = (d00 * d21 - d01 * d20) / denom;
-  ScalarT u = ScalarT(1) - v - w;
+  const ScalarT d00 = v0.ScalarProduct(v0);
+  const ScalarT d01 = v0.ScalarProduct(v1);
+  const ScalarT d11 = v1.ScalarProduct(v1);
+  const ScalarT d20 = v2.ScalarProduct(v0);
+  const ScalarT d21 = v2.ScalarProduct(v1);
+  const ScalarT denom = d00 * d11 - d01 * d01;
+  const ScalarT v = (d11 * d20 - d01 * d21) / denom;
+  const ScalarT w = (d00 * d21 - d01 * d20) / denom;
+  const ScalarT u = ScalarT(1) - v - w;
   return (u >= ScalarT(0)) && (v >= ScalarT(0)) && (w >= ScalarT(0));
 }
 
@@ -70,9 +70,9 @@ namespace geometry3d {
     return (p - P_proj).Length();
   }
 
-  const Segment edges[3] = {{face.GetP(), face.GetQ()},
-                            {face.GetQ(), face.GetR()},
-                            {face.GetR(), face.GetP()}};
+  const std::array edges = {Segment{face.GetP(), face.GetQ()},
+                            Segment{face.GetQ(), face.GetR()},
+                            Segment{face.GetR(), face.GetP()}};
 
   ScalarT min_dist = std::numeric_limits<ScalarT>::max();
   for (const auto& edge : edges) {
@@ -89,9 +89,9 @@ namespace geometry3d {
 [[nodiscard]] ScalarT AngleBetweenVectors(const Vector& a, const Vector& b) {
   using std::clamp, std::acos;
 
-  ScalarT dot_product = a.ScalarProduct(b);
-  ScalarT a_length = a.Length();
-  ScalarT b_length = b.Length();
+  const ScalarT dot_product = a.ScalarProduct(b);
+  const ScalarT a_length = a.Length();
+  const ScalarT b_length = b.Length();
 
   if (a_length == ScalarT(0) || b_length == ScalarT(0)) {
     throw std::invalid_argument("Vectors must not be zero-length.");

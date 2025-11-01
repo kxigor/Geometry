@@ -12,7 +12,10 @@
 #include "Double/Double.hpp"
 
 namespace geometry3d {
-using ScalarT = Double<long double, 1e-10L>;
+
+using BaseDoubleT = long double;
+static constexpr BaseDoubleT kBasicAccuracy = 1e-10L;
+using ScalarT = Double<BaseDoubleT, kBasicAccuracy>;
 
 class Vector {
  public:
@@ -21,7 +24,7 @@ class Vector {
 
   /*============================= Helpers =============================*/
   struct Hash {
-    std::size_t operator()(const Vector& vector) const noexcept {
+    constexpr std::size_t operator()(const Vector& vector) const noexcept {
       std::size_t seed = 0;
       hash_combine(seed, vector.x_);
       hash_combine(seed, vector.y_);
@@ -30,8 +33,10 @@ class Vector {
     }
 
    private:
-    static void hash_combine(std::size_t& seed, const ScalarT& v) {
+    constexpr static void hash_combine(std::size_t& seed, const ScalarT& v) {
+      // NOLINTBEGIN
       seed ^= std::hash<ScalarT>{}(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      // NOLINTEND
     }
   };
 
@@ -44,7 +49,7 @@ class Vector {
 
   constexpr Vector(ScalarT x, ScalarT y, ScalarT z) : x_(x), y_(y), z_(z) {}
 
-  constexpr Vector(const CoordTuple& coord)
+  explicit constexpr Vector(const CoordTuple& coord)
       : x_(std::get<0>(coord)),
         y_(std::get<1>(coord)),
         z_(std::get<2>(coord)) {}
@@ -233,6 +238,12 @@ class Line {
 class Plane {
  public:
   /*==================== Constructors/Destructors =====================*/
+  constexpr Plane() = delete;
+
+  constexpr Plane(const Plane& /*unused*/) = default;
+
+  constexpr Plane(Plane&& /*unused*/) = default;
+
   constexpr Plane(const Point& origin, const Vector& normal)
       : origin_(origin), normal_(normal) {}
 
@@ -240,6 +251,11 @@ class Plane {
       : origin_(p1), normal_(CalcPlaneNormal(p1, p2, p3)) {}
 
   constexpr ~Plane() = default;
+
+  /*=========================== Assignments ===========================*/
+  constexpr Plane& operator=(const Plane& /*unused*/) = default;
+
+  constexpr Plane& operator=(Plane&& /*unused*/) = default;
 
   /*============================ Getters ==============================*/
   [[nodiscard]] constexpr const auto& GetOrigin() const noexcept {
@@ -263,31 +279,34 @@ static constexpr const Plane Oyz = {{0, 0, 0}, {-1, 0, 0}};
 class Face {
  public:
   /*==================== Constructors/Destructors =====================*/
-  Face() = delete;
+  constexpr Face() = delete;
 
-  Face(const Face& /*unused*/) = default;
+  constexpr Face(const Face& /*unused*/) = default;
 
-  Face(Face&& /*unused*/) = default;
+  constexpr Face(Face&& /*unused*/) = default;
 
-  ~Face() = default;
+  constexpr ~Face() = default;
 
-  Face(const Point& p, const Point& q, const Point& r) : p_(p), q_(q), r_(r) {
+  constexpr Face(const Point& p, const Point& q, const Point& r)
+      : p_(p), q_(q), r_(r) {
     normal_ = CalcPlaneNormal(p, q, r);
   }
 
   /*=========================== Assignments ===========================*/
-  Face& operator=(const Face& /*unused*/) = default;
+  constexpr Face& operator=(const Face& /*unused*/) = default;
 
-  Face& operator=(Face&& /*unused*/) = default;
+  constexpr Face& operator=(Face&& /*unused*/) = default;
 
   /*============================= Getters =============================*/
-  [[nodiscard]] const auto& GetP() const noexcept { return p_; }
+  [[nodiscard]] constexpr const auto& GetP() const noexcept { return p_; }
 
-  [[nodiscard]] const auto& GetQ() const noexcept { return q_; }
+  [[nodiscard]] constexpr const auto& GetQ() const noexcept { return q_; }
 
-  [[nodiscard]] const auto& GetR() const noexcept { return r_; }
+  [[nodiscard]] constexpr const auto& GetR() const noexcept { return r_; }
 
-  [[nodiscard]] const auto& GetNormal() const noexcept { return normal_; }
+  [[nodiscard]] constexpr const auto& GetNormal() const noexcept {
+    return normal_;
+  }
 
  private:
   /*============================= Fields ==============================*/
@@ -303,7 +322,7 @@ class Segment {
  public:
   /*============================= Helpers =============================*/
   struct Hash {
-    std::size_t operator()(const Segment& e) const noexcept {
+    constexpr std::size_t operator()(const Segment& e) const noexcept {
       auto hash1 = Point::Hash{}(e.a_);
       auto hash2 = Point::Hash{}(e.b_);
       return hash1 ^ hash2;
@@ -311,36 +330,40 @@ class Segment {
   };
 
   /*==================== Constructors/Destructors =====================*/
-  Segment() = delete;
+  constexpr Segment() = delete;
 
-  Segment(const Segment& /*unused*/) = default;
+  constexpr Segment(const Segment& /*unused*/) = default;
 
-  Segment(Segment& /*unused*/) = default;
+  constexpr Segment(Segment&& /*unused*/) = default;
 
-  ~Segment() = default;
+  constexpr Segment(const Point& A, const Point& B) : a_(A), b_(B) {}
 
-  Segment(const Point& A, const Point& B) : a_(A), b_(B) {}
+  constexpr ~Segment() = default;
 
   /*=========================== Assignments ===========================*/
-  Segment& operator=(const Segment& /*unused*/) = default;
+  constexpr Segment& operator=(const Segment& /*unused*/) = default;
 
-  Segment& operator=(Segment&& /*unused*/) = default;
+  constexpr Segment& operator=(Segment&& /*unused*/) = default;
 
   /*============================ Operators ============================*/
-  [[nodiscard]] bool operator==(const Segment& other) const noexcept {
+  [[nodiscard]] constexpr bool operator==(const Segment& other) const noexcept {
     return (a_ == other.a_ && b_ == other.b_) ||
            (a_ == other.b_ && b_ == other.a_);
   }
 
   /*============================ Geometry =============================*/
-  [[nodiscard]] bool IsDegenerate() const noexcept { return a_ == b_; }
+  [[nodiscard]] constexpr bool IsDegenerate() const noexcept {
+    return a_ == b_;
+  }
 
   /*============================= Getters =============================*/
-  [[nodiscard]] const auto& GetA() const noexcept { return a_; }
+  [[nodiscard]] constexpr const auto& GetA() const noexcept { return a_; }
 
-  [[nodiscard]] const auto& GetB() const noexcept { return b_; }
+  [[nodiscard]] constexpr const auto& GetB() const noexcept { return b_; }
 
-  [[nodiscard]] auto GetAsTuple() const noexcept { return std::tie(a_, b_); }
+  [[nodiscard]] constexpr auto GetAsTuple() const noexcept {
+    return std::tie(a_, b_);
+  }
 
  private:
   /*============================= Fields ==============================*/
@@ -372,9 +395,9 @@ class ConvexHull {
     bool operator()(const Point& lhs, const Point& rhs) const;
 
    private:
-    const Point& p1_;
-    const Point& p2_;
-    const Vector& normal_;
+    const Point& p1_;       // NOLINT
+    const Point& p2_;       // NOLINT
+    const Vector& normal_;  // NOLINT
   };
 
  public:
@@ -383,7 +406,16 @@ class ConvexHull {
 
   ~ConvexHull() = default;
 
-  ConvexHull(PointsT points);
+  explicit ConvexHull(PointsT points);
+
+  ConvexHull(const ConvexHull& /*unused*/) = default;
+
+  ConvexHull(ConvexHull&& /*unused*/) = default;
+
+  /*=========================== Assignments ===========================*/
+  ConvexHull& operator=(const ConvexHull& /*unused*/) = default;
+
+  ConvexHull& operator=(ConvexHull&& /*unused*/) = default;
 
   /*============================ Geometry =============================*/
   [[nodiscard]] ScalarT CalcDistance(const Point& point) const noexcept;

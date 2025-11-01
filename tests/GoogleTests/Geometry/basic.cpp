@@ -326,38 +326,72 @@ TEST(GrahamsScanTest, GetPivot) {
 }
 
 TEST(CrossProductTest, BasicCases) {
-  EXPECT_EQ(CrossProduct({0, 0}, {1, 0}, {2, 0}), ScalarT(0));
-  EXPECT_EQ(CrossProduct({0, 0}, {0, 1}, {0, 2}), ScalarT(0));
-  EXPECT_EQ(CrossProduct({0, 0}, {1, 1}, {2, 2}), ScalarT(0));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{1, 0},
+                         geometry::Point{2, 0}),
+            ScalarT(0));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{0, 1},
+                         geometry::Point{0, 2}),
+            ScalarT(0));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{1, 1},
+                         geometry::Point{2, 2}),
+            ScalarT(0));
 }
 
 TEST(CrossProductTest, NonZeroValues) {
-  EXPECT_EQ(CrossProduct({0, 0}, {1, 0}, {0, 1}), ScalarT(1));
-  EXPECT_EQ(CrossProduct({1, 1}, {3, 1}, {2, 3}), ScalarT(4));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{1, 0},
+                         geometry::Point{0, 1}),
+            ScalarT(1));
+  EXPECT_EQ(CrossProduct(geometry::Point{1, 1}, geometry::Point{3, 1},
+                         geometry::Point{2, 3}),
+            ScalarT(4));
 
-  EXPECT_EQ(CrossProduct({0, 0}, {0, 1}, {1, 0}), ScalarT(-1));
-  EXPECT_EQ(CrossProduct({1, 1}, {2, 3}, {3, 1}), ScalarT(-4));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{0, 1},
+                         geometry::Point{1, 0}),
+            ScalarT(-1));
+  EXPECT_EQ(CrossProduct(geometry::Point{1, 1}, geometry::Point{2, 3},
+                         geometry::Point{3, 1}),
+            ScalarT(-4));
 }
 
 TEST(CrossProductTest, DegenerateCases) {
-  EXPECT_EQ(CrossProduct({1, 1}, {1, 1}, {1, 1}), ScalarT(0));
-  EXPECT_EQ(CrossProduct({1, 1}, {1, 1}, {2, 2}), ScalarT(0));
-  EXPECT_EQ(CrossProduct({1, 1}, {2, 2}, {2, 2}), ScalarT(0));
-  EXPECT_EQ(CrossProduct({0, 0}, {2, 2}, {1, 1}), ScalarT(0));
+  EXPECT_EQ(CrossProduct(geometry::Point{1, 1}, geometry::Point{1, 1},
+                         geometry::Point{1, 1}),
+            ScalarT(0));
+  EXPECT_EQ(CrossProduct(geometry::Point{1, 1}, geometry::Point{1, 1},
+                         geometry::Point{2, 2}),
+            ScalarT(0));
+  EXPECT_EQ(CrossProduct(geometry::Point{1, 1}, geometry::Point{2, 2},
+                         geometry::Point{2, 2}),
+            ScalarT(0));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{2, 2},
+                         geometry::Point{1, 1}),
+            ScalarT(0));
 }
 
 TEST(CrossProductTest, PrecisionCases) {
   ScalarT big = 1e10L;
-  EXPECT_EQ(CrossProduct({0, 0}, {big, 0}, {0, big}), big * big);
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{big, 0},
+                         geometry::Point{0, big}),
+            big * big);
   ScalarT small = 1e-10L;
-  EXPECT_EQ(CrossProduct({0, 0}, {small, 0}, {0, small}), small * small);
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{small, 0},
+                         geometry::Point{0, small}),
+            small * small);
 }
 
 TEST(CrossProductTest, NonStandardCases) {
-  EXPECT_EQ(CrossProduct({-1, -1}, {1, -1}, {0, 1}), ScalarT(4));
-  EXPECT_EQ(CrossProduct({-2, 3}, {1, 1}, {4, 5}), ScalarT(18));
-  EXPECT_EQ(CrossProduct({0, 0}, {0, 5}, {3, 0}), ScalarT(-15));
-  EXPECT_EQ(CrossProduct({0, 0}, {3, 0}, {0, 5}), ScalarT(15));
+  EXPECT_EQ(CrossProduct(geometry::Point{-1, -1}, geometry::Point{1, -1},
+                         geometry::Point{0, 1}),
+            ScalarT(4));
+  EXPECT_EQ(CrossProduct(geometry::Point{-2, 3}, geometry::Point{1, 1},
+                         geometry::Point{4, 5}),
+            ScalarT(18));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{0, 5},
+                         geometry::Point{3, 0}),
+            ScalarT(-15));
+  EXPECT_EQ(CrossProduct(geometry::Point{0, 0}, geometry::Point{3, 0},
+                         geometry::Point{0, 5}),
+            ScalarT(15));
 }
 
 TEST(CrossProductTest, AreaProperty) {
@@ -505,43 +539,44 @@ TEST(RotateRayDegreeTest, OriginPreserved) {
 }
 
 TEST(IsIntersectTest, PointToPoint) {
-  EXPECT_TRUE(IsIntersect({1, 2}, {1, 2}));
+  EXPECT_TRUE(IsIntersect(geometry::Point{1, 2}, geometry::Point{1, 2}));
 
-  EXPECT_FALSE(IsIntersect({1, 2}, {1, 3}));
-  EXPECT_FALSE(IsIntersect({1, 2}, {2, 2}));
-  EXPECT_FALSE(IsIntersect({1, 2}, {3, 4}));
+  EXPECT_FALSE(IsIntersect(geometry::Point{1, 2}, geometry::Point{1, 3}));
+  EXPECT_FALSE(IsIntersect(geometry::Point{1, 2}, geometry::Point{2, 2}));
+  EXPECT_FALSE(IsIntersect(geometry::Point{1, 2}, geometry::Point{3, 4}));
 }
 
 TEST(IsIntersectTest, PointToSegment) {
-  Segment seg({0, 0}, {5, 5});
+  Segment seg(geometry::Point{0, 0}, geometry::Point{5, 5});
 
-  EXPECT_TRUE(IsIntersect({2.5, 2.5}, seg));
-  EXPECT_TRUE(IsIntersect({0, 0}, seg));
-  EXPECT_TRUE(IsIntersect({5, 5}, seg));
+  EXPECT_TRUE(IsIntersect(geometry::Point{2.5, 2.5}, seg));
+  EXPECT_TRUE(IsIntersect(geometry::Point{0, 0}, seg));
+  EXPECT_TRUE(IsIntersect(geometry::Point{5, 5}, seg));
 
-  EXPECT_FALSE(IsIntersect({-1, -1}, seg));
-  EXPECT_FALSE(IsIntersect({6, 6}, seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{-1, -1}, seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{6, 6}, seg));
 
-  EXPECT_FALSE(IsIntersect({2, 3}, seg));
-  EXPECT_FALSE(IsIntersect({3, 2}, seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{2, 3}, seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{3, 2}, seg));
 
-  Segment vert_seg({2, 0}, {2, 4});
-  EXPECT_TRUE(IsIntersect({2, 2}, vert_seg));
-  EXPECT_FALSE(IsIntersect({2, 5}, vert_seg));
-  EXPECT_FALSE(IsIntersect({3, 2}, vert_seg));
+  Segment vert_seg(geometry::Point{2, 0}, geometry::Point{2, 4});
+  EXPECT_TRUE(IsIntersect(geometry::Point{2, 2}, vert_seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{2, 5}, vert_seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{3, 2}, vert_seg));
 
-  Segment hor_seg({0, 3}, {5, 3});
-  EXPECT_TRUE(IsIntersect({2.5, 3}, hor_seg));
-  EXPECT_FALSE(IsIntersect({2.5, 4}, hor_seg));
-  EXPECT_FALSE(IsIntersect({6, 3}, hor_seg));
+  Segment hor_seg(geometry::Point{0, 3}, geometry::Point{5, 3});
+  EXPECT_TRUE(IsIntersect(geometry::Point{2.5, 3}, hor_seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{2.5, 4}, hor_seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{6, 3}, hor_seg));
 }
 
 TEST(IsIntersectTest, SegmentToPoint) {
-  Segment seg({1, 1}, {4, 4});
+  Segment seg(geometry::Point{1, 1}, geometry::Point{4, 4});
   Point p(2.5, 2.5);
 
   EXPECT_EQ(IsIntersect(p, seg), IsIntersect(seg, p));
-  EXPECT_EQ(IsIntersect({0, 0}, seg), IsIntersect(seg, {0, 0}));
+  EXPECT_EQ(IsIntersect(geometry::Point{0, 0}, seg),
+            IsIntersect(seg, geometry::Point{0, 0}));
 }
 
 TEST(IsIntersectTest, ThreePointVersion) {
@@ -554,38 +589,38 @@ TEST(IsIntersectTest, ThreePointVersion) {
 }
 
 TEST(IsIntersectTest, EdgeCases) {
-  Segment point_seg({2, 2}, {2, 2});
-  EXPECT_TRUE(IsIntersect({2, 2}, point_seg));
-  EXPECT_FALSE(IsIntersect({2, 3}, point_seg));
+  Segment point_seg(geometry::Point{2, 2}, geometry::Point{2, 2});
+  EXPECT_TRUE(IsIntersect(geometry::Point{2, 2}, point_seg));
+  EXPECT_FALSE(IsIntersect(geometry::Point{2, 3}, point_seg));
 
-  Segment same_x({1, 0}, {1, 5});
-  EXPECT_TRUE(IsIntersect({1, 3}, same_x));
-  EXPECT_FALSE(IsIntersect({2, 3}, same_x));
+  Segment same_x(geometry::Point{1, 0}, geometry::Point{1, 5});
+  EXPECT_TRUE(IsIntersect(geometry::Point{1, 3}, same_x));
+  EXPECT_FALSE(IsIntersect(geometry::Point{2, 3}, same_x));
 
-  Segment same_y({0, 1}, {5, 1});
-  EXPECT_TRUE(IsIntersect({3, 1}, same_y));
-  EXPECT_FALSE(IsIntersect({3, 2}, same_y));
+  Segment same_y(geometry::Point{0, 1}, geometry::Point{5, 1});
+  EXPECT_TRUE(IsIntersect(geometry::Point{3, 1}, same_y));
+  EXPECT_FALSE(IsIntersect(geometry::Point{3, 2}, same_y));
 }
 
 TEST(IsIntersectTest, SegmentToSegment) {
-  Segment seg1({0, 0}, {2, 2});
-  Segment seg2({0, 2}, {2, 0});
+  Segment seg1(geometry::Point{0, 0}, geometry::Point{2, 2});
+  Segment seg2(geometry::Point{0, 2}, geometry::Point{2, 0});
   EXPECT_TRUE(IsIntersect(seg1, seg2));
 
-  Segment seg3({0, 0}, {1, 1});
-  Segment seg4({2, 2}, {3, 3});
+  Segment seg3(geometry::Point{0, 0}, geometry::Point{1, 1});
+  Segment seg4(geometry::Point{2, 2}, geometry::Point{3, 3});
   EXPECT_FALSE(IsIntersect(seg3, seg4));
 
-  Segment seg5({0, 0}, {1, 1});
-  Segment seg6({1, 1}, {2, 0});
+  Segment seg5(geometry::Point{0, 0}, geometry::Point{1, 1});
+  Segment seg6(geometry::Point{1, 1}, geometry::Point{2, 0});
   EXPECT_TRUE(IsIntersect(seg5, seg6));
 
-  Segment seg7({0, 0}, {1, 1});
-  Segment seg8({2, 2}, {3, 3});
+  Segment seg7(geometry::Point{0, 0}, geometry::Point{1, 1});
+  Segment seg8(geometry::Point{2, 2}, geometry::Point{3, 3});
   EXPECT_FALSE(IsIntersect(seg7, seg8));
 
-  Segment seg9({0, 0}, {2, 2});
-  Segment seg10({1, 1}, {3, 3});
+  Segment seg9(geometry::Point{0, 0}, geometry::Point{2, 2});
+  Segment seg10(geometry::Point{1, 1}, geometry::Point{3, 3});
   EXPECT_TRUE(IsIntersect(seg9, seg10));
 }
 
@@ -605,120 +640,128 @@ TEST(IsIntersectTest, LineToLine) {
 
 TEST(IsIntersectTest, RayToLine) {
   Line line(1, 0, -3);
-  Ray ray1({0, 0}, {1, 0});
+  Ray ray1(geometry::Point{0, 0}, geometry::Point{1, 0});
   EXPECT_TRUE(IsIntersect(ray1, line));
 
-  Ray ray2({0, 0}, {-1, 0});
+  Ray ray2(geometry::Point{0, 0}, geometry::Point{-1, 0});
   EXPECT_FALSE(IsIntersect(ray2, line));
 
-  Ray ray3({3, 0}, {0, 1});
+  Ray ray3(geometry::Point{3, 0}, geometry::Point{0, 1});
   EXPECT_TRUE(IsIntersect(ray3, line));
 
-  Ray ray4({0, 0}, {0, 1});
+  Ray ray4(geometry::Point{0, 0}, geometry::Point{0, 1});
   EXPECT_FALSE(IsIntersect(ray4, line));
 }
 
 TEST(IsIntersectTest, RayToRay) {
-  Ray ray1({0, 0}, {1, 0});
-  Ray ray2({2, 0}, {-1, 0});
+  Ray ray1(geometry::Point{0, 0}, geometry::Point{1, 0});
+  Ray ray2(geometry::Point{2, 0}, geometry::Point{-1, 0});
   EXPECT_FALSE(IsIntersect(ray1, ray2));
 
-  Ray ray3({0, 0}, {1, 0});
-  Ray ray4({0, 1}, {1, 0});
+  Ray ray3(geometry::Point{0, 0}, geometry::Point{1, 0});
+  Ray ray4(geometry::Point{0, 1}, geometry::Point{1, 0});
   EXPECT_FALSE(IsIntersect(ray3, ray4));
 
-  Ray ray5({0, 0}, {1, 0});
-  Ray ray6({2, 0}, {1, 0});
+  Ray ray5(geometry::Point{0, 0}, geometry::Point{1, 0});
+  Ray ray6(geometry::Point{2, 0}, geometry::Point{1, 0});
   EXPECT_TRUE(IsIntersect(ray5, ray6));
 }
 
 TEST(IntersectTest, RayToLine) {
   Line line(1, -1, 0);
-  Ray ray({0, 1}, {1, -1});
+  Ray ray(geometry::Point{0, 1}, geometry::Point{1, -1});
 
   auto intersection = Intersect(ray, line);
   ASSERT_TRUE(intersection.has_value());
   EXPECT_EQ(intersection.value(), Point(0.5, 0.5));
 
-  Ray ray2({0, 1}, {1, 0});
+  Ray ray2(geometry::Point{0, 1}, geometry::Point{1, 0});
   EXPECT_TRUE(Intersect(ray2, line).has_value());
 
-  Ray ray3({1, 1}, {1, 0});
+  Ray ray3(geometry::Point{1, 1}, geometry::Point{1, 0});
   auto intersection2 = Intersect(ray3, line);
   ASSERT_TRUE(intersection2.has_value());
   EXPECT_EQ(intersection2.value(), Point(1.0L, 1.0L));
 }
 
 TEST(EdgeCasesTest, SpecialCases) {
-  Segment vert1({1, 0}, {1, 5});
-  Segment vert2({1, 3}, {1, 7});
+  Segment vert1(geometry::Point{1, 0}, geometry::Point{1, 5});
+  Segment vert2(geometry::Point{1, 3}, geometry::Point{1, 7});
   EXPECT_TRUE(IsIntersect(vert1, vert2));
 
-  Segment hor1({0, 2}, {5, 2});
-  Segment hor2({3, 2}, {7, 2});
+  Segment hor1(geometry::Point{0, 2}, geometry::Point{5, 2});
+  Segment hor2(geometry::Point{3, 2}, geometry::Point{7, 2});
   EXPECT_TRUE(IsIntersect(hor1, hor2));
 
-  Segment point1({2, 2}, {2, 2});
-  Segment point2({2, 2}, {2, 2});
+  Segment point1(geometry::Point{2, 2}, geometry::Point{2, 2});
+  Segment point2(geometry::Point{2, 2}, geometry::Point{2, 2});
   EXPECT_TRUE(IsIntersect(point1, point2));
 }
 
 TEST(IsIntersectTest, PointInConvexConvexHull) {
-  ConvexHull pentagon({{0, 0}, {2, 0}, {3, 2}, {1, 4}, {-1, 2}});
+  ConvexHull pentagon({geometry::Point{0, 0}, geometry::Point{2, 0},
+                       geometry::Point{3, 2}, geometry::Point{1, 4},
+                       geometry::Point{-1, 2}});
 
-  EXPECT_TRUE(IsIntersect(pentagon, {1, 2}));
-  EXPECT_TRUE(IsIntersect({2, 1}, pentagon));
+  EXPECT_TRUE(IsIntersect(pentagon, geometry::Point{1, 2}));
+  EXPECT_TRUE(IsIntersect(geometry::Point{2, 1}, pentagon));
 
-  EXPECT_FALSE(IsIntersect(pentagon, {4, 4}));
-  EXPECT_FALSE(IsIntersect({0, -1}, pentagon));
+  EXPECT_FALSE(IsIntersect(pentagon, geometry::Point{4, 4}));
+  EXPECT_FALSE(IsIntersect(geometry::Point{0, -1}, pentagon));
 
-  EXPECT_TRUE(IsIntersect(pentagon, {1.5, 3}));
-  EXPECT_TRUE(IsIntersect({0, 0}, pentagon));
+  EXPECT_TRUE(IsIntersect(pentagon, geometry::Point{1.5, 3}));
+  EXPECT_TRUE(IsIntersect(geometry::Point{0, 0}, pentagon));
 
-  ConvexHull point_poly({{3, 3}});
-  EXPECT_TRUE(IsIntersect(point_poly, {3, 3}));
-  EXPECT_FALSE(IsIntersect(point_poly, {3, 4}));
+  ConvexHull point_poly({geometry::Point{3, 3}});
+  EXPECT_TRUE(IsIntersect(point_poly, geometry::Point{3, 3}));
+  EXPECT_FALSE(IsIntersect(point_poly, geometry::Point{3, 4}));
 
-  ConvexHull segment_poly({{1, 1}, {3, 3}});
-  EXPECT_TRUE(IsIntersect(segment_poly, {2, 2}));
-  EXPECT_FALSE(IsIntersect(segment_poly, {4, 4}));
+  ConvexHull segment_poly({geometry::Point{1, 1}, geometry::Point{3, 3}});
+  EXPECT_TRUE(IsIntersect(segment_poly, geometry::Point{2, 2}));
+  EXPECT_FALSE(IsIntersect(segment_poly, geometry::Point{4, 4}));
 }
 
 TEST(IsIntersectBorderTest, PointOnConvexHullBorder) {
-  ConvexHull quad({{0, 0}, {4, 0}, {4, 2}, {2, 4}, {0, 2}});
+  ConvexHull quad({geometry::Point{0, 0}, geometry::Point{4, 0},
+                   geometry::Point{4, 2}, geometry::Point{2, 4},
+                   geometry::Point{0, 2}});
 
-  EXPECT_TRUE(IsIntersectBorder(quad, {2, 0}));
-  EXPECT_TRUE(IsIntersectBorder({4, 1}, quad));
+  EXPECT_TRUE(IsIntersectBorder(quad, geometry::Point{2, 0}));
+  EXPECT_TRUE(IsIntersectBorder(geometry::Point{4, 1}, quad));
 
-  EXPECT_FALSE(IsIntersectBorder(quad, {2, 1}));
-  EXPECT_FALSE(IsIntersectBorder({1, 1}, quad));
+  EXPECT_FALSE(IsIntersectBorder(quad, geometry::Point{2, 1}));
+  EXPECT_FALSE(IsIntersectBorder(geometry::Point{1, 1}, quad));
 
-  EXPECT_FALSE(IsIntersectBorder(quad, {5, 5}));
-  EXPECT_FALSE(IsIntersectBorder({-1, 0}, quad));
+  EXPECT_FALSE(IsIntersectBorder(quad, geometry::Point{5, 5}));
+  EXPECT_FALSE(IsIntersectBorder(geometry::Point{-1, 0}, quad));
 
-  EXPECT_TRUE(IsIntersectBorder(quad, {0, 0}));
-  EXPECT_TRUE(IsIntersectBorder({2, 4}, quad));
+  EXPECT_TRUE(IsIntersectBorder(quad, geometry::Point{0, 0}));
+  EXPECT_TRUE(IsIntersectBorder(geometry::Point{2, 4}, quad));
 }
 
 TEST(IsIntersectTest, PointInConvexConvexHullEdgeCases) {
-  ConvexHull thin({{0, 0}, {100, 0}, {100, 0.0001L}});
-  EXPECT_TRUE(IsIntersect(thin, {50, 0.00005L}));
-  EXPECT_FALSE(IsIntersect(thin, {50, 0.0002L}));
+  ConvexHull thin({geometry::Point{0, 0}, geometry::Point{100, 0},
+                   geometry::Point{100, 0.0001L}});
+  EXPECT_TRUE(IsIntersect(thin, geometry::Point{50, 0.00005L}));
+  EXPECT_FALSE(IsIntersect(thin, geometry::Point{50, 0.0002L}));
 
-  ConvexHull collinear({{0, 0}, {1, 1}, {2, 2}, {3, 3}});
-  EXPECT_TRUE(IsIntersect(collinear, {1.5, 1.5}));
-  EXPECT_FALSE(IsIntersect(collinear, {1.5, 1.6}));
+  ConvexHull collinear({geometry::Point{0, 0}, geometry::Point{1, 1},
+                        geometry::Point{2, 2}, geometry::Point{3, 3}});
+  EXPECT_TRUE(IsIntersect(collinear, geometry::Point{1.5, 1.5}));
+  EXPECT_FALSE(IsIntersect(collinear, geometry::Point{1.5, 1.6}));
 }
 
 TEST(HalfPlaneTest, ConvexConvexHullHalfPlane) {
   HalfPlane hp(1, 0, -2);
 
-  ConvexHull inside({{2, 0}, {4, 0}, {4, 2}, {2, 2}});
+  ConvexHull inside({geometry::Point{2, 0}, geometry::Point{4, 0},
+                     geometry::Point{4, 2}, geometry::Point{2, 2}});
   EXPECT_TRUE(std::all_of(inside.begin(), inside.end(), [&hp](const Point& p) {
     return IsIntersect(hp, p);
   }));
 
-  ConvexHull intersecting({{1, 0}, {3, 0}, {3, 2}, {1, 2}});
+  ConvexHull intersecting({geometry::Point{1, 0}, geometry::Point{3, 0},
+                           geometry::Point{3, 2}, geometry::Point{1, 2}});
   bool has_inside = false, has_outside = false;
   for (const auto& p : intersecting) {
     if (IsIntersect(hp, p))
@@ -728,7 +771,8 @@ TEST(HalfPlaneTest, ConvexConvexHullHalfPlane) {
   }
   EXPECT_TRUE(has_inside && has_outside);
 
-  ConvexHull outside({{0, 0}, {1, 0}, {1, 1}, {0, 1}});
+  ConvexHull outside({geometry::Point{0, 0}, geometry::Point{1, 0},
+                      geometry::Point{1, 1}, geometry::Point{0, 1}});
   EXPECT_TRUE(
       std::none_of(outside.begin(), outside.end(),
                    [&hp](const Point& p) { return IsIntersect(hp, p); }));
@@ -736,43 +780,44 @@ TEST(HalfPlaneTest, ConvexConvexHullHalfPlane) {
 
 TEST(IntersectTest, RayLineIntersection) {
   Line line(1, -1, 0);
-  Ray ray1({0, 1}, {1, -1});
+  Ray ray1(geometry::Point{0, 1}, geometry::Point{1, -1});
 
   auto intersect1 = Intersect(ray1, line);
   ASSERT_TRUE(intersect1.has_value());
   EXPECT_EQ(intersect1.value(), Point(0.5L, 0.5L));
 
-  Ray ray2({0, 1}, {1, 1});
+  Ray ray2(geometry::Point{0, 1}, geometry::Point{1, 1});
   EXPECT_FALSE(Intersect(ray2, line).has_value());
 
-  Ray ray3({1, 1}, {1, 0});
+  Ray ray3(geometry::Point{1, 1}, geometry::Point{1, 0});
   auto intersect3 = Intersect(ray3, line);
   ASSERT_TRUE(intersect3.has_value());
   EXPECT_EQ(intersect3.value(), Point(1.0L, 1.0L));
 
-  Ray ray4({0, 1}, {-1, 1});
+  Ray ray4(geometry::Point{0, 1}, geometry::Point{-1, 1});
   EXPECT_FALSE(Intersect(ray4, line).has_value());
 }
 
 TEST(IntersectTest, HalfPlaneSegmentIntersection) {
   HalfPlane hp(1, 0, -2);  // x >= 2
 
-  auto intersect1 = Intersect(hp, {1, 0}, {3, 0});
+  auto intersect1 = Intersect(hp, geometry::Point{1, 0}, geometry::Point{3, 0});
   ASSERT_TRUE(intersect1.has_value());
   EXPECT_EQ(intersect1.value(), Point(2.0L, 0.0L));
 
-  auto intersect2 = Intersect(hp, {3, 1}, {4, 2});
+  auto intersect2 = Intersect(hp, geometry::Point{3, 1}, geometry::Point{4, 2});
   EXPECT_FALSE(intersect2.has_value());
 
-  auto intersect3 = Intersect(hp, {0, 0}, {1, 1});
+  auto intersect3 = Intersect(hp, geometry::Point{0, 0}, geometry::Point{1, 1});
   EXPECT_FALSE(intersect3.has_value());
 
-  auto intersect4 = Intersect(hp, {1, 0}, {1, 1});
+  auto intersect4 = Intersect(hp, geometry::Point{1, 0}, geometry::Point{1, 1});
   EXPECT_FALSE(intersect4.has_value());
 }
 
 TEST(IntersectTest, ConvexHullHalfPlaneIntersection) {
-  ConvexHull convex_hull({{0, 0}, {4, 0}, {4, 4}, {0, 4}});
+  ConvexHull convex_hull({geometry::Point{0, 0}, geometry::Point{4, 0},
+                          geometry::Point{4, 4}, geometry::Point{0, 4}});
   HalfPlane hp(1, 0, -2);  // x >= 2
 
   ConvexHull intersected = Intersect(convex_hull, hp);
@@ -793,7 +838,8 @@ TEST(IntersectTest, ConvexHullHalfPlaneIntersection) {
 }
 
 TEST(IntersectTest, MultipleHalfPlanesIntersection) {
-  PointsT initial = {{0, 0}, {10, 0}, {10, 10}, {0, 10}};
+  PointsT initial = {geometry::Point{0, 0}, geometry::Point{10, 0},
+                     geometry::Point{10, 10}, geometry::Point{0, 10}};
   HalfPlanesT half_planes = {
       {1, 0, -2},  // x >= 2
       {-1, 0, 7},  // x <= 7
@@ -814,21 +860,24 @@ TEST(IntersectTest, MultipleHalfPlanesIntersection) {
 }
 
 TEST(EdgeCasesTest, SpecialIntersectionCases) {
-  PointsT segment = {{1, 1}, {3, 3}};
+  PointsT segment = {geometry::Point{1, 1}, geometry::Point{3, 3}};
+
   HalfPlane hp(1, -1, 0);
 
-  auto seg_intersect = Intersect(segment, hp);
+  auto seg_intersect = Intersect(ConvexHull(std::move(segment)), hp);
   ASSERT_EQ(seg_intersect.GetSize(), 2u);
   EXPECT_EQ(seg_intersect[0], Point(1, 1));
   EXPECT_EQ(seg_intersect[1], Point(3, 3));
 
-  PointsT point = {{2, 2}};
-  auto point_intersect = Intersect(point, hp);
+  PointsT point = {geometry::Point{2, 2}};
+  auto point_intersect = Intersect(ConvexHull(std::move(point)), hp);
   EXPECT_EQ(point_intersect.GetSize(), 1u);
 
   HalfPlane tangent(1, 1, -4);
-  PointsT square = {{0, 0}, {2, 0}, {2, 2}, {0, 2}};
-  auto tangent_intersect = Intersect(square, tangent);
+  PointsT square = {geometry::Point{0, 0}, geometry::Point{2, 0},
+                    geometry::Point{2, 2}, geometry::Point{0, 2}};
+
+  auto tangent_intersect = Intersect(ConvexHull(std::move(square)), tangent);
   ASSERT_EQ(tangent_intersect.GetSize(), 1u);
   EXPECT_NE(std::find(tangent_intersect.begin(), tangent_intersect.end(),
                       Point(2, 2)),
@@ -836,10 +885,11 @@ TEST(EdgeCasesTest, SpecialIntersectionCases) {
 }
 
 TEST(PrecisionTest, FloatingPointIntersection) {
-  PointsT convex_hull = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
+  PointsT convex_hull = {geometry::Point{0, 0}, geometry::Point{1, 0},
+                         geometry::Point{1, 1}, geometry::Point{0, 1}};
   HalfPlane hp(1, 1, -1);
 
-  auto intersection = Intersect(convex_hull, hp);
+  auto intersection = Intersect(ConvexHull(std::move(convex_hull)), hp);
   ASSERT_FALSE(intersection.IsEmpty());
 
   bool has_origin = std::any_of(
